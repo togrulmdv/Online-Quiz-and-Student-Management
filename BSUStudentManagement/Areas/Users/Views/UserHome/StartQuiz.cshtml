@@ -1,0 +1,300 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+@{
+    ViewData["Title"] = "StartQuiz";
+    Layout = "~/Areas/Users/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Users/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Take Quiz" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+
+                <div class="postcontent col-lg-12">
+
+
+                    <div class="row p-1">
+
+                        <div class="col-lg-6 col-md-6">
+                            <div class="alert alert-info">
+                                <div id="countdown-ex2" class="countdown countdown-medium is-countdown" data-year="2021">
+                                    <span class="countdown-row countdown-show3">
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="hours_counter">0</span>
+                                            <span class="countdown-period">Hours</span>
+                                        </span>
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="minutes_counter">0</span>
+                                            <span class="countdown-period">Minutes</span>
+                                        </span>
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="seconds_counter">0</span>
+                                            <span class="countdown-period">Seconds</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 ">
+                                <div class="mt-3 justify-content-end" >
+                                    <div class="toggle faq pb-3 mb-4 faq-marketplace faq-authors">
+                                        <div class="toggle-header">
+                                            <div class="toggle-icon color">
+                                                <i class="toggle-closed icon-question-sign"></i>
+                                                <i class="toggle-open icon-question-sign"></i>
+                                            </div>
+                                            <div class="toggle-title font-weight-semibold pl-1">
+                                              Important Instructions
+                                            </div>
+                                            <div class="toggle-icon color">
+                                                <i class="toggle-closed icon-chevron-down text-black-50"></i>
+                                                <i class="toggle-open icon-chevron-up color"></i>
+                                            </div>
+                                        </div>
+                                        <div class="toggle-content text-black-50 pl-4" style="display: none;">
+
+                                         
+                                                <ul class="iconlist mb-0">
+                                                    <li><i class="icon-line-circle-check color"></i> Your answer will be saved autometically.</li>
+                                                    <li><i class="icon-line-circle-check color"></i> By closing browser, your result will be submitted autometically.</li>
+                                                    <li><i class="icon-line-circle-check color"></i> When time finished, your result will be submitted autometically.</li>
+                                                    <li><i class="icon-line-circle-check color"></i> You will not be able to resume your quiz once finished.</li>
+                                                </ul>
+                                          
+
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+
+
+                            </div>
+
+                    </div>
+
+                    <div id="quiz_questions">
+                        @{
+                            @Html.Partial("~/Areas/Users/Views/UserHome/_QuizQuestions.cshtml", Model)
+                        }
+
+                        @*@{
+                                Html.RenderAction("StudentResultList", "AdminBasicData", new { quiz_id = Model.quiz_obj.quiz_id, pageId = 1 });
+                            }*@
+
+                    </div>
+
+
+
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</section><!-- #content end -->
+
+@section scripts{
+
+    <!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+    <script>
+
+
+        $(document).ready(function () {
+
+            @{
+                int? quizRemainingMinutes =Model!=null &&  Model.quiz_obj.allowed_time_minutes.HasValue ? Model.quiz_obj.allowed_time_minutes : 0;
+            }
+         
+
+            // Set the date we're counting down to
+           // var countDownDate = new Date("Jan 5, 2022 15:37:25").getTime();
+            //var countDownDate = new Date("@DateTime.Now.AddMinutes(Convert.ToInt32(quizRemainingMinutes)).ToString("MMM dd, yyyy HH:mm:ss")").getTime();
+
+            var currentDate = new Date();
+            var totalMinutes = '@quizRemainingMinutes';
+            currentDate.setMinutes(currentDate.getMinutes() + Number(totalMinutes));
+            var countDownDate = new Date(currentDate).getTime();
+            debugger
+
+
+            console.log(countDownDate);
+            // Update the count down every 1 second
+            var x = setInterval(function () {
+              
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+
+                // Time calculations for days, hours, minutes and seconds
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                //// Output the result in an element with id="demo"
+                //document.getElementById("demo").innerHTML = days + "d " + hours + "h "
+                //    + minutes + "m " + seconds + "s ";
+
+                // Output for hours
+                document.getElementById("hours_counter").innerHTML = hours;
+
+                // Output for minutes
+                document.getElementById("minutes_counter").innerHTML = minutes;
+
+                // Output for seconds
+                document.getElementById("seconds_counter").innerHTML = seconds;
+
+                //--update remaining time in database after an interval of 1 minute
+                if (seconds == 57) { //on 57, it is a little stable because some time during page load, the 59 and 58 may skip, therfore I take two minutes previous
+                    //in this function I am using async=true so that not affect counter speed
+                    updateQuizRemainingTime('@Model.quiz_obj.quiz_id', minutes);
+                }
+
+                // If the count down is over, write some text
+                if (distance < 0) {
+                    console.log(distance);
+                    debugger
+                    clearInterval(x);
+                    //document.getElementById("demo").innerHTML = "EXPIRED";
+                    alert("Your time get finished for this quiz!");
+                    window.location.href = '/users/courses/1';
+                }
+            }, 1000);
+        });
+
+
+        function SaveAnswer(question_id, correct_option) {
+
+            if (question_id == undefined || question_id < 1) {
+                alert("An error occured. Please try again");
+                return false;
+            }
+
+            if (correct_option == undefined || correct_option == "" || correct_option == " ") {
+                alert("An error occured. Please try again");
+                return false;
+            }
+
+            var formData = { question_id: question_id, correct_option: correct_option};
+            $.ajax({
+                url: '@Url.Action("SaveAnswer", "UserHome", new { area = "Users"})',
+                type: 'POST',
+
+                data: formData,
+                async: false,
+                success: function (response) {
+                    debugger
+                    if (response == "saved successfully" || response.message == "saved successfully") {
+                        console.log(response)
+
+                    }  else {
+                        alert("An error occured. Please try again");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        }
+
+        function updateQuizRemainingTime(quiz_id, remaining_minutes) {
+
+            if (quiz_id == undefined || quiz_id < 1) {
+
+                return false;
+            }
+
+            if (remaining_minutes == undefined) {
+
+                return false;
+            }
+
+
+            var formData = { quiz_id: quiz_id, remaining_minutes: remaining_minutes};
+            $.ajax({
+                url: '@Url.Action("updateQuizRemainingTime", "UserHome", new { area = "Users"})',
+                type: 'POST',
+
+                data: formData,
+                async: true,
+                success: function (response) {
+
+                        console.log(response.message)
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        }
+
+    </script>
+
+
+
+}
+
+
+

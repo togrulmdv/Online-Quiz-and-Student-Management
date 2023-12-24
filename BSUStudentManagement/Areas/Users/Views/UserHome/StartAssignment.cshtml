@@ -1,0 +1,340 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.CommonModels
+@using DAL.Services
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+@{
+    ViewData["Title"] = "StartQuiz";
+    Layout = "~/Areas/Users/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Users/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Start Assignment" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+
+                <div class="postcontent col-lg-12">
+
+
+                    <div class="row p-1">
+
+                        <div class="col-lg-6 col-md-6">
+                            <div class="alert alert-info">
+                                <div id="countdown-ex2" class="countdown countdown-medium is-countdown" data-year="2021">
+                                    <span class="countdown-row countdown-show3">
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="hours_counter">0</span>
+                                            <span class="countdown-period">Hours</span>
+                                        </span>
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="minutes_counter">0</span>
+                                            <span class="countdown-period">Minutes</span>
+                                        </span>
+                                        <span class="countdown-section">
+                                            <span class="countdown-amount" id="seconds_counter">0</span>
+                                            <span class="countdown-period">Seconds</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    <div id="quiz_questions">
+
+                        <div class="tabs side-tabs mb-0 clearfix" id="tab-6" style="border: 2px solid whitesmoke; padding: 7px;">
+
+                            <ul class="tab-nav tab-nav2 clearfix">
+                                <li><a href="#tabs-21"><i class="icon-home2"></i> Assignment</a></li>
+                                <li><a href="#tabs-22"><i class="icon-reply"></i>Your Answer</a></li>
+
+                            </ul>
+
+                            <div class="tab-container">
+
+                                <div class="tab-content clearfix" id="tabs-21">
+
+                                    <form method="post" class="" asp-area="Teachers" asp-controller="justDummyForm" asp-action="justDummyForm" id="justDummyForm" enctype="multipart/form-data">
+
+                                        @Html.AntiForgeryToken()
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-12">
+                                                @*<label for="description">Body<small class="text-danger">*</small></label>*@
+                                                <textarea name="body" id="assignment_body" class="form-control" cols="30" rows="15" required>@Model.assignment_obj.body</textarea>
+
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="tab-content clearfix" id="tabs-22">
+
+
+                                    @using (Html.BeginForm("SaveStudentAssignmentAnswer", "UserHome", FormMethod.Post, new { area = "Users", @id = "SaveAssignment_Form", enctype = "multipart/form-data" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-12">
+                                                @*<label for="description">Body<small class="text-danger">*</small></label>*@
+                                                <textarea name="student_ans" id="student_ans" class="form-control" cols="30" rows="15" required>@Model.assignment_obj.student_ans</textarea>
+
+                                                <input type="hidden" id="assignment_id" name="assignment_id" value="@Model.assignment_obj.assignment_id" />
+
+
+                                            </div>
+
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <button type="submit" tabindex="10" onclick="return DoYouWantToSave();" class="button btn-sm button-3d button-rounded gradient-ocean float-right"><i class="icon-save"></i> Save</button>
+
+                                            </div>
+
+
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="divider"><i class="icon-circle"></i></div>
+                    </div>
+
+
+
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</section><!-- #content end -->
+@section scripts{
+
+<!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<!-- TinyMCE Plugin -->
+<script type="text/javascript" src="~/Content/ThemeContent/js/components/tinymce/tinymce.min.js"></script>
+
+<script type="text/javascript">
+    tinymce.init({
+        selector: '#assignment_body',
+        menubar: false,
+
+        setup: function (editor) {
+            editor.on('change', function (e) {
+                editor.save();
+            });
+        }
+    });
+
+
+    tinymce.init({
+        selector: '#student_ans',
+        menubar: false,
+
+        setup: function (editor) {
+            editor.on('change', function (e) {
+                editor.save();
+            });
+        }
+    });
+</script>
+
+
+<script>
+
+
+        $(document).ready(function () {
+
+            @{
+                int? quizRemainingMinutes = Model.assignment_obj.allowed_time_minutes.HasValue ? Model.assignment_obj.allowed_time_minutes : 0;
+            }
+            // Set the date we're counting down to
+           // var countDownDate = new Date("Jan 5, 2022 15:37:25").getTime();
+           // var countDownDate = new Date("@DateTime.Now.AddMinutes(Convert.ToInt32(quizRemainingMinutes)).ToString("MMM dd, yyyy HH:mm:ss")").getTime();
+
+            var currentDate = new Date();
+            var totalMinutes = '@quizRemainingMinutes';
+            currentDate.setMinutes(currentDate.getMinutes() + Number(totalMinutes));
+            var countDownDate = new Date(currentDate).getTime();
+
+
+
+            // Update the count down every 1 second
+            var x = setInterval(function () {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+
+                // Time calculations for days, hours, minutes and seconds
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                //// Output the result in an element with id="demo"
+                //document.getElementById("demo").innerHTML = days + "d " + hours + "h "
+                //    + minutes + "m " + seconds + "s ";
+
+                // Output for hours
+                document.getElementById("hours_counter").innerHTML = hours;
+
+                // Output for minutes
+                document.getElementById("minutes_counter").innerHTML = minutes;
+
+                // Output for seconds
+                document.getElementById("seconds_counter").innerHTML = seconds;
+
+                //--update remaining time in database after an interval of 1 minute
+                if (seconds == 57) { //on 57, it is a little stable because some time during page load, the 59 and 58 may skip, therfore I take two minutes previous
+                    //in this function I am using async=true so that not affect counter speed
+                   updateAssignmentRemainingTime('@Model.assignment_obj.assignment_id', minutes);
+                }
+
+                // If the count down is over, write some text
+                if (distance < 0) {
+                    console.log(distance);
+
+                    clearInterval(x);
+                    //document.getElementById("demo").innerHTML = "EXPIRED";
+                    alert("Your time get finished for this assignment!");
+                     window.location.href = '/users/courses/1';
+                }
+            }, 1000);
+        });
+
+
+
+
+    function updateAssignmentRemainingTime(assignment_id, remaining_minutes) {
+
+        if (assignment_id == undefined || assignment_id < 1) {
+
+                return false;
+            }
+
+            if (remaining_minutes == undefined) {
+
+                return false;
+            }
+
+
+        var formData = { assignment_id: assignment_id, remaining_minutes: remaining_minutes};
+            $.ajax({
+                url: '@Url.Action("updateAssignmentRemainingTime", "UserHome", new { area = "Users"})',
+                type: 'POST',
+
+                data: formData,
+                async: true,
+                success: function (response) {
+
+                        console.log(response.message)
+
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            });
+
+        }
+
+
+    function DoYouWantToSave() {
+        
+
+        var student_ans = $("#student_ans").val();
+        var assignment_id = $("#assignment_id").val();
+        if (student_ans == "" || student_ans == " " || student_ans == undefined) {
+            alert("Please write your answer then save!");
+            return false;
+        }
+
+        if (assignment_id < 1 || assignment_id == undefined) {
+            alert("Something went wrong. Please try again!");
+            return false;
+        }
+
+        var isAgree = confirm("By saving, all your changes will be saved and you will not be able to continue again!");
+        if (isAgree) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+</script>
+
+
+
+}
+
+
+

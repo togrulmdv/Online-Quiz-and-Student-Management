@@ -1,0 +1,750 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+@{
+    ViewData["Title"] = "Quiz Detail";
+    Layout = "~/Areas/Teachers/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Teachers/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Quiz Detailt" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+            <div class="row gutter-40 col-mb-80">
+
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+
+                <div class="postcontent col-lg-12">
+
+
+                    <div class="tabs tabs-alt tabs-tb tabs-bordered clearfix " id="tab-8">
+
+                        <ul class="tab-nav clearfix">
+                            <li><a href="#tabs-1"><i class="icon-home2 mr-0"></i></a></li>
+                            <li><a href="#tabs-2">Questions</a></li>
+                            <li><a href="#tabs-3">Result</a></li>
+
+                        </ul>
+
+                        <div class="tab-container">
+                            <!--Tab 1 starts here-->
+                            <div class="tab-content clearfix" id="tabs-1">
+
+
+                                <div class="feature-box pt-2 pb-2 pl-3 pr-3 media-box" style="border-radius: 6px; box-shadow: 0 3px 16px rgba(3,27,78,.1); border: 0px solid #e5e8ed;">
+                                    <div class="feature-box pt-2 pb-2 pl-3 pr-3 media-box" style="border-radius: 6px; box-shadow: 0 3px 16px rgba(3,27,78,.1); border: 0px solid #e5e8ed;">
+
+
+                                        @using (Html.BeginForm("EditQuizDetail", "TeacherHome", FormMethod.Post, new { area = "Teachers", @id = "Add_Quiz_Form", enctype = "multipart/form-data" }))
+                                        {
+
+                                            @Html.AntiForgeryToken()
+                                            <div class="form-row">
+                                                <div class="form-group col-md-8">
+                                                    <label for="title">Title<small class="text-danger">*</small></label>
+                                                    <input type="text" class="form-control" tabindex="1" autocomplete="off" id="title" name="title" value="@(Model.quiz_obj == null ? "" : Model.quiz_obj.title)" required>
+
+
+                                                    <input type="hidden" id="quiz_id" name="quiz_id" value="@(Model.quiz_obj == null ? 0 : Model.quiz_obj.quiz_id)">
+
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="status">Status<small class="text-danger">*</small></label>
+                                                    <select id="status" name="status" tabindex="2" class="form-control" required>
+                                                        @{
+                                                            <option selected>Select</option>
+
+                                                            foreach (var item in ViewBag.StatusList as List<status>)
+                                                            {
+                                                                <option value="@item.status_id" @(Model.quiz_obj.status == item.status_id ? "selected" : "")>@item.title</option>
+                                                            }
+                                                        }
+                                                    </select>
+
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-row">
+
+
+                                                <div class="form-group col-md-4">
+                                                    <label for="start_date">Start Date<small class="text-danger">*</small></label>
+                                                    <div class="form-group">
+                                                        <div class="input-group text-left" data-target-input="nearest" data-target=".datetimepicker">
+
+                                                            <input type="text" id="start_date" tabindex="3" autocomplete="off" name="start_date" value="@(Model.quiz_obj == null ? "" : Model.quiz_obj.start_date)" class="form-control text-left component-datepicker today" placeholder="" required>
+
+                                                            <div class="input-group-append" data-target=".datetimepicker" data-toggle="datetimepicker">
+                                                                <div class="input-group-text"><i class="icon-calendar"></i></div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group col-md-4">
+                                                    <label for="end_date">End Date<small class="text-danger">*</small></label>
+                                                    <div class="form-group">
+                                                        <div class="input-group text-left" data-target-input="nearest" data-target=".datetimepicker">
+
+                                                            <input type="text" id="end_date" tabindex="4" autocomplete="off" name="end_date" value="@(Model.quiz_obj == null ? "" : Model.quiz_obj.end_date)" class="form-control text-left component-datepicker today" required>
+
+                                                            <div class="input-group-append" data-target=".datetimepicker" data-toggle="datetimepicker">
+                                                                <div class="input-group-text"><i class="icon-calendar"></i></div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="allowed_time_minutes">Allowed Time In Minutes<small class="text-danger">*</small></label>
+                                                    <input type="number" min="0" autocomplete="off" tabindex="5" class="form-control" id="allowed_time_minutes" name="allowed_time_minutes" value="@(Model.quiz_obj == null ? 0 : Model.quiz_obj.allowed_time_minutes)" required>
+
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label for="category_id">Quiz Category<small class="text-danger">*</small></label>
+                                                    <select id="category_id" name="category_id" class="form-control" tabindex="6" required>
+                                                        @{
+                                                            <option selected>Select</option>
+
+                                                            foreach (var item in ViewBag.QuizCategories as List<quiz_categories>)
+                                                            {
+                                                                <option value="@item.category_id" @(Model.quiz_obj.category_id == item.category_id ? "selected" : "")>@item.category_name</option>
+                                                            }
+                                                        }
+                                                    </select>
+
+
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="course_id">Course<small class="text-danger">*</small></label>
+                                                    <select id="course_id" name="course_id" tabindex="7" class="form-control" required>
+                                                        @{
+                                                            <option selected>Select</option>
+
+                                                            foreach (var item in ViewBag.CoursesList as List<courses>)
+                                                            {
+                                                                <option value="@item.course_id" @(Model.quiz_obj.course_id == item.course_id ? "selected" : "")>@item.title</option>
+                                                            }
+                                                        }
+                                                    </select>
+
+
+                                                </div>
+
+                                                <div class="form-group col-md-4">
+                                                    <label for="passing_marks">Passing Marks(%)<small class="text-danger">*</small></label>
+                                                    @{
+                                                        string passing_marks = (Model.quiz_obj == null ? "0" : Model.quiz_obj.passing_marks.ToString());
+
+                                                    }
+                                                    <input type="number" min="0" max="100" autocomplete="off" tabindex="8" value="@passing_marks" class="form-control" id="passing_marks_edit" name="passing_marks" required>
+
+                                                </div>
+
+
+
+
+
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="form-group col-md-8">
+                                                    <label for="description">Description<small class="text-danger">*</small></label>
+                                                    <textarea type="text" class="form-control" autocomplete="off" tabindex="9" id="description" name="description" required>@(Model.quiz_obj == null ? "" : Model.quiz_obj.description)</textarea>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group col-md-12">
+                                                    <button type="submit" tabindex="10" class="button btn-sm button-3d button-rounded gradient-ocean float-right"><i class="icon-save"></i> Update</button>
+
+                                                </div>
+
+
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                            <!--Tab 2 starts here-->
+                            <div class="tab-content clearfix" id="tabs-2">
+
+                                <div class="special-div-less-margin">
+                                    <div>
+
+
+                                        <button class="button button-3d button-rounded gradient-grey-orange  float-right" data-toggle="modal" data-target="#myAddModal"><i class="icon-plus"></i> Add Question</button>
+
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+
+                                    <table class="table   mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>S.No</th>
+                                                <th>Question</th>
+
+                                                <th>Action</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                if (Model.quiz_ques_list != null)
+                                                {
+                                                    int index_no = 1;
+                                                    foreach (var item in Model.quiz_ques_list)
+                                                    {
+
+                                                        <tr>
+                                                            <td>@index_no</td>
+                                                            <td>
+
+                                                                <div class="posts-sm row col-mb-30">
+                                                                    <div class="entry col-12">
+                                                                        <div class="entry-title">
+                                                                            <h4><a href="demo-news-single.html">@item.question_title</a></h4>
+                                                                        </div>
+
+                                                                        <ul class="iconlist mb-0">
+                                                                            <li><i class="icon-line-circle-check color"></i><span @((item.correct_option == "option_a") ? "class=text-success" : "")> @item.option_a</span></li>
+                                                                            <li><i class="icon-line-circle-check color"></i><span @((item.correct_option == "option_b") ? "class=text-success" : "")> @item.option_b</span></li>
+                                                                            <li><i class="icon-line-circle-check color"></i> <span @((item.correct_option == "option_c") ? "class=text-success" : "")>@item.option_c</span></li>
+                                                                            <li><i class="icon-line-circle-check color"></i><span @((item.correct_option == "option_d") ? "class=text-success" : "")> @item.option_d</span></li>
+
+                                                                        </ul>
+                                                                    </div>
+
+
+
+                                                                </div>
+
+                                                            </td>
+                                                            <td>
+                                                                <div class="justify-content-center">
+                                                                    <a href="#" class="center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-edit" style="font-size:23px;"></i></a>
+                                                                    <ul class="dropdown-menu dropdown-menu-right" style="">
+                                                                        <li>
+                                                                            <a class="dropdown-item" href="#!" onclick="EditItem('@item.question_id' ,'@item.question_title', '@item.option_a', '@item.option_b', '@item.option_c', '@item.option_d', '@item.correct_option');" data-toggle="modal" data-target="#myEditModal"><span class="icon-line-plus"></span> Edit</a>
+
+                                                                            <a class="dropdown-item" href="#!" onclick="DeleteQuestion('@item.question_id');" data-toggle="modal" data-target="#myDeleteModal"><span class="icon-line-delete"></span> Delete</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+
+
+                                                        </tr>
+
+                                                        index_no++;
+                                                    }
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                            <!--Tab 2 starts here-->
+                            <div class="tab-content clearfix" id="tabs-3">
+
+
+                                @* @{
+                                    //Html.RenderAction("StudentResultList", "TeacherHome", new { area = "Teachers", quiz_id = Model.quiz_obj.quiz_id, pageId = 1 });
+                                    //  @await Html.PartialAsync("StudentResultList", new { area = "Teachers", quiz_id = Model.quiz_obj.quiz_id, pageId = 1 })
+
+                                    }
+                                *@
+
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="line"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</section><!-- #content end -->
+<!--Save Modal -->
+<div class="modal fade" id="myAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add Question</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+
+                @using (Html.BeginForm("AddQuestion", "TeacherHome", FormMethod.Post, new { area = "Teachers", @id = "Add_Question_Form", enctype = "multipart/form-data" }))
+                {
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body">
+
+                        <!--this div for showing form process after insert button click-->
+                    <div class="form-process" style="display: none;">
+                            <div class="css3-spinner">
+                                <div class="css3-spinner-scaler"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 form-group">
+                                <label for="question_title">Question Title<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="1" id="question_title" name="question_title" class="sm-form-control border-form-control" required placeholder="" />
+
+                                <input type="hidden" id="quiz_id" name="quiz_id" value="@Model.quiz_obj.quiz_id" />
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="option_a">Option A<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="2" id="option_a" name="option_a" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+
+                                <label for="option_b">Option B<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="3" id="option_b" name="option_b" class="sm-form-control border-form-control " required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="option_c">Option C<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="4" id="option_c" name="option_c" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="title">Option D<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="5" id="option_d" name="option_d" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="correct_option">Correct Option<small class="text-danger">*</small></label>
+                                <select tabindex="6" id="correct_option" name="correct_option" class="sm-form-control border-form-control required" required>
+                                    <option>Select</option>
+                                    <option value="option_a">Option A</option>
+                                    <option value="option_b">Option B</option>
+                                    <option value="option_c">Option C</option>
+                                    <option value="option_d">Option D</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Close</button>
+
+                        <button type="submit" tabindex="7" onclick="return validateForm();" class="button btn-sm button-3d button-rounded gradient-ocean"><i class="icon-save"></i> Save</button>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Edit Modal -->
+<div class="modal fade" id="myEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Update Question!</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+
+                @using (Html.BeginForm("EditQuestion", "TeacherHome", FormMethod.Post, new { area = "Teachers", @id = "Edit_Question_Form", enctype = "multipart/form-data" }))
+                {
+
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body">
+
+                        <!--this div for showing form process after insert button click-->
+                    <div class="form-process" style="display: none;">
+                            <div class="css3-spinner">
+                                <div class="css3-spinner-scaler"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 form-group">
+                                <label for="question_title_edit">Question Title<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="1" id="question_title_edit" name="question_title" class="sm-form-control border-form-control" required placeholder="" />
+
+                                <input type="hidden" id="question_id_edit" name="question_id" value="" />
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="option_a_edit">Option A<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="2" id="option_a_edit" name="option_a" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+
+                                <label for="option_b_edit">Option B<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="3" id="option_b_edit" name="option_b" class="sm-form-control border-form-control " required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="option_c">Option C<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="4" id="option_c_edit" name="option_c" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="title">Option D<small class="text-danger">*</small></label>
+                                <input type="text" tabindex="5" id="option_d_edit" name="option_d" class="sm-form-control border-form-control" required placeholder="" />
+
+                            </div>
+                            <div class="col-lg-6 form-group">
+                                <label for="correct_option">Correct Option<small class="text-danger">*</small></label>
+                                <select tabindex="6" id="correct_option_edit" name="correct_option" class="sm-form-control border-form-control required" required>
+                                    <option>Select</option>
+                                    <option value="option_a">Option A</option>
+                                    <option value="option_b">Option B</option>
+                                    <option value="option_c">Option C</option>
+                                    <option value="option_d">Option D</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Close</button>
+
+                        <button type="submit" tabindex="7" onclick="return validateFormQuestionEdit();" class="button btn-sm button-3d button-rounded gradient-ocean"><i class="icon-edit"></i> Update</button>
+
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Delete Modal -->
+<div class="modal fade" id="myDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Delete Question!</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+
+                @using (Html.BeginForm("DeleteQuestion", "TeacherHome", FormMethod.Post, new { area = "Teachers", @id = "Delete_Question_Form", enctype = "multipart/form-data" }))
+                {
+
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body">
+
+                        <!--this div for showing form process after insert button click-->
+                    <div class="form-process" style="display: none;">
+                            <div class="css3-spinner">
+                                <div class="css3-spinner-scaler"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 form-group">
+                            <div class="entry-title">
+                                <h4><a href="demo-news-single.html">Do you want to delete this record?</a></h4>
+                            </div>
+
+                            <input type="hidden" id="question_id_delete" name="question_id" value="" />
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Cancel</button>
+
+                        <button type="submit" tabindex="4" class="button  btn-sm button-3d button-rounded gradient-horizon"><i class="icon-trash2"></i> Delete</button>
+
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+<!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+<script>
+
+        $( document ).ready(function() {
+       GetStudentResultList();
+    });
+
+        function validateForm() {
+
+            var result = false;
+
+            var question_title = $('#question_title').val();
+            if (question_title == undefined || question_title == "" || question_title == " ") {
+                alert("Title required");
+                return result;
+            }
+
+            var option_a = $('#option_a').val();
+            var option_b = $('#option_b').val();
+            var option_c = $('#option_c').val();
+            var option_d = $('#option_d').val();
+
+            if (option_a == undefined || option_a == "" || option_a == " ") {
+                alert("Option A required");
+                return result;
+            }
+            if (option_b == undefined || option_b == "" || option_b == " ") {
+                alert("Option B required");
+                return result;
+            }
+            if (option_c == undefined || option_c == "" || option_c == " ") {
+                alert("Option C required");
+                return result;
+            }
+            if (option_d == undefined || option_d == "" || option_d == " ") {
+                alert("Option D required");
+                return result;
+            }
+
+            var correct_option = $('#correct_option').val();
+            if (correct_option == undefined || correct_option == "" || correct_option == " ") {
+                alert("Correct option required");
+                return result;
+            }
+
+
+            var question_options = [];
+            question_options.push(option_a);
+            question_options.push(option_b);
+            question_options.push(option_c);
+            question_options.push(option_d);
+
+            var alreadySeen = [];
+
+            question_options.forEach(function (str) {
+
+                if (alreadySeen[str]) {
+                    //--event.preventDefault() is for stopping default event
+                    event.preventDefault();
+                    alert("Error: Dublicate option exist. " + "(" + str + ")");
+                    result = false;
+
+
+                } else {
+                    alreadySeen[str] = true;
+                    result = true;
+
+                }
+
+
+            });
+            return result;
+
+        }
+        function validateFormQuestionEdit() {
+            //debugger
+            var result_edit = false;
+
+            var question_options = [];
+
+            var option_a_edit = $('#option_a_edit').val();
+            var option_b_edit = $('#option_b_edit').val();
+            var option_c_edit = $('#option_c_edit').val();
+            var option_d_edit = $('#option_d_edit').val();
+
+            question_options.push(option_a_edit);
+            question_options.push(option_b_edit);
+            question_options.push(option_c_edit);
+            question_options.push(option_d_edit);
+
+            var alreadySeen = [];
+
+            question_options.forEach(function (str) {
+
+                if (alreadySeen[str]) {
+                    //--event.preventDefault() is for stopping default event
+                    event.preventDefault();
+                    alert("Error: Dublicate option exist. " + "(" + str + ")");
+                    result_edit = false;
+
+
+                } else {
+                    alreadySeen[str] = true;
+                    result_edit = true;
+
+                }
+
+
+            });
+            return result_edit;
+        }
+
+
+        function EditItem(question_id, question_title, option_a, option_b, option_c, option_d, correct_option) {
+            $('#question_id_edit').val(question_id);
+            $('#question_title_edit').val(question_title);
+            $('#option_a_edit').val(option_a);
+
+            $('#option_b_edit').val(option_b);
+            $('#option_c_edit').val(option_c);
+            $('#option_d_edit').val(option_d);
+            $('#correct_option_edit').val(correct_option);
+
+
+        }
+
+        function DeleteQuestion(question_id) {
+            $('#question_id_delete').val(question_id);
+
+        }
+
+
+
+         function GetStudentResultList() {
+
+            var quiz_id = '@Model.quiz_obj.quiz_id';
+            var pageId = 1;
+
+            var Url = '@Url.Action("StudentResultList","TeacherHome", new { area="Teachers"})';
+
+            $.ajax({
+                type: "GET",
+                url: Url,
+                data: { quiz_id: quiz_id, pageId: pageId },
+                // datatype: "json",
+                cache: false,
+                async: false,
+
+                success: function (data) {
+
+
+                    $('#tabs-3').html(data);
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    hideSearchLoader();
+                    alert("An error occured. Please try again!");
+                }
+            })
+
+        }
+
+</script>
+
+
+
+}
+
+
+

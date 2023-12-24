@@ -1,0 +1,554 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Helpers.PageHelpers
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+@{
+    ViewData["Title"] = "Students List";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Admin/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Students" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+                <div class="col-lg-12 " style="padding-bottom: 28px;">
+                    <div class="card p-3 bg-light">
+                        <div class="car-body">
+
+
+
+
+
+
+                            <form method="get" class="row" asp-area="Admin" asp-controller="AdminHome" asp-action="StudentList" id="search_form" enctype="multipart/form-data">
+
+                                @Html.AntiForgeryToken()
+
+
+
+
+                                <div class="col-md-3 form-group">
+                                    <label for="user_id_search">Student ID</label>
+                                    <input type="text" id="user_id_search" tabindex="1" name="user_id" class="form-control input-sm  valid" value="" aria-invalid="false">
+
+                                </div>
+
+
+                                <div class="col-md-3 form-group">
+                                    <label for="user_name_search">User Name</label>
+                                    <input type="text" id="user_name_search" tabindex="2" name="user_name" class="form-control input-sm  valid" value="" aria-invalid="false">
+
+                                </div>
+
+                                <div class="col-md-3  form-group">
+                                    <label for="email_search">Email</label>
+                                    <input type="text" id="email_search" tabindex="3" name="email" class="form-control input-sm  valid" value="" aria-invalid="false">
+                                </div>
+
+
+
+
+
+                                <div class="col-md-3 form-group">
+                                    <br />
+
+
+                                    <button type="button" tabindex="3" onclick="SubmitSearchForm();" class="button button-3d button-rounded gradient-blue-green"><i class="icon-search"></i> Search</button>
+
+                                </div>
+
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="special-div-less-margin">
+                    <div>
+
+
+                        <button class="button button-3d button-rounded gradient-grey-orange  float-right" data-toggle="modal" data-target="#myAddModal"><i class="icon-plus"></i> Add Student</button>
+
+                    </div>
+                </div>
+
+                <div class="postcontent col-lg-12" id="MainDataSection">
+
+
+
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead>
+                                <tr>
+
+                                    <th>Student ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>User Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Password</th>
+                                    <th>Courses</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    if (Model.student_list.Count() > 0)
+                                    {
+                                        foreach (var item in Model.student_list)
+                                        {
+                                            <tr>
+                                                <td>@item.user_id</td>
+                                                <td>@item.first_name</td>
+                                                <td>@item.last_name</td>
+                                                <td>
+
+                                                    @item.user_name
+
+                                                </td>
+                                                <td>     @item.email</td>
+
+                                                @{
+                                                    if (item.is_active == 1)
+                                                    {
+                                                        <td>Active</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>In Active</td>
+                                                    }
+                                                }
+                                                <td>@item.password</td>
+
+                                                <td>
+                                                    <a class="" href="@Url.Action("StudentRegisteredCourses", "AdminHome", new { area = "Admin", pageId=1, student_id= item.user_id })"> View</a>
+                                                </td>
+                                                <td>
+                                                    <div class="justify-content-center">
+                                                        <a href="#" class="center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-edit" style="font-size:23px;"></i></a>
+                                                        <ul class="dropdown-menu dropdown-menu-right" style="">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#!" onclick="EditItem('@item.user_id', '@item.first_name', '@item.last_name', '@item.user_name', '@item.email', '@item.is_active');" data-toggle="modal" data-target="#myEditModal"><span class="icon-line-plus"></span> Edit</a>
+
+                                                                <a class="dropdown-item" href="#!" onclick="DeleteItem('@item.user_id');" data-toggle="modal" data-target="#myDeleteModal"><span class="icon-line-delete"></span> Delete</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        }
+
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3 ustify-content-end" data-label="pagination-div" style="float:right;">
+
+
+                        @{
+                            if (Model != null && Model.pageHelperObj != null)
+                            {
+                                PagerHelper ph = new PagerHelper();
+                                ph.CurrentPage = Model.pageHelperObj.CurrentPage;
+                                ph.TotalRecords = Model.pageHelperObj.TotalRecords;
+                                ph.RecordsPerPage = Model.pageHelperObj.RecordsPerPage;
+
+                                ph.AjaxEnabled = true;
+                                ph.OnClientClickAjaxCall = "PaginationAfterAjax(this)";
+
+                                @await Html.PartialAsync("~/Views/Shared/_Pager.cshtml", ph)
+                            }
+
+                        }
+
+                    </div>
+
+
+
+
+                    <div class="line"></div>
+
+
+
+                </div><!-- .postcontent end -->
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</section><!-- #content end -->
+<!--Save Modal -->
+<div class="modal fade" id="myAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add Student</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+
+
+
+                @using (Html.BeginForm("addstudent", "AdminHome", FormMethod.Post, new { area = "admin", @id = "courseadd_form", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="modal-body">
+
+
+
+                        <div class="col-12 form-group">
+                            <label for="first_name">First Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="first_name" name="first_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+                        <div class="col-12 form-group">
+                            <label for="last_name">Last Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="last_name" name="last_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+                        <div class="col-12 form-group">
+                            <label for="user_name">User Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="user_name" name="user_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+
+
+                        <div class="col-12 form-group">
+                            <label for="email">Email<small class="text-danger">*</small></label>
+                            <input type="email" tabindex="1" id="email" name="email" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+
+                        <div class="col-12 form-group">
+                            <label for="is_active">Is Active<small class="text-danger">*</small></label>
+                            <select id="is_active" name="is_active" class="sm-form-control border-form-control ">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Close</button>
+
+                        <button type="submit" tabindex="6" class="button btn-sm button-3d button-rounded gradient-ocean"><i class="icon-save"></i> Save</button>
+
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Edit Modal -->
+<div class="modal fade" id="myEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Edit Student</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+                @using (Html.BeginForm("EditStudent", "AdminHome", FormMethod.Post, new { area = "admin", @id = "CourseEdit_form", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="modal-body">
+
+
+                        <div class="col-12 form-group">
+                            <label for="first_name">First Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="first_name_edit" name="first_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+                            <input type="hidden" id="user_id_edit" name="user_id" />
+                        </div>
+                        <div class="col-12 form-group">
+                            <label for="last_name">Last Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="last_name_edit" name="last_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+                        <div class="col-12 form-group">
+                            <label for="user_name">User Name<small class="text-danger">*</small></label>
+                            <input type="text" tabindex="1" id="user_name_edit" name="user_name" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+
+
+                        <div class="col-12 form-group">
+                            <label for="email">Email<small class="text-danger">*</small></label>
+                            <input type="email" tabindex="1" id="email_edit" name="email" autocomplete="off" class="sm-form-control border-form-control " placeholder="" required />
+
+
+                        </div>
+
+                        <div class="col-12 form-group">
+                            <label for="is_active">Is Active<small class="text-danger">*</small></label>
+                            <select id="is_active_edit" name="is_active" class="sm-form-control border-form-control ">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Close</button>
+
+                        <button type="submit" tabindex="4" class="button btn-sm button-3d button-rounded gradient-ocean"><i class="icon-edit"></i> Update</button>
+
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Delete Modal -->
+<div class="modal fade" id="myDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Delete Student</h4>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+
+
+                @using (Html.BeginForm("DeleteStudent", "AdminHome", FormMethod.Post, new { area = "Admin", @id = "CourseDelete_form", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="modal-body">
+
+
+
+                        <div class="col-12 form-group">
+                            <div class="entry-title">
+                                <h4><a href="demo-news-single.html">Do you want to delete this record?</a></h4>
+                            </div>
+
+
+                        </div>
+
+                        <div>
+                            <input type="hidden" id="user_id_delete" name="user_id" />
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button class="button btn-sm button-3d button-rounded gradient-earth" data-dismiss="modal"><i class="icon-lock"></i> Cancel</button>
+
+                        <button type="submit" tabindex="1" class="button  btn-sm button-3d button-rounded gradient-horizon"><i class="icon-trash2"></i> Delete</button>
+
+                    </div>
+
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+<!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+<script>
+
+    function SubmitSearchForm() {
+
+        var user_id = $('#user_id_search').val();
+        var user_name = $('#user_name_search').val();
+        var email = $('#email_search').val();
+        //--set page id to 1 for first time form submission
+        var pageId = 1;
+
+       // var Url = '/admin/students-list/';
+          var Url = '@Url.Action("StudentsListPartial","AdminHome", new { area="Admin"})';
+
+        showSearchLoader();
+
+
+        $.ajax({
+            type: "GET",
+            url: Url,
+                data: { user_id: user_id, user_name: user_name, email: email, pageId: pageId },
+            // datatype: "json",
+            cache: false,
+            async: false,
+            beforeSend: function () {
+
+                showSearchLoader();
+            },
+            success: function (data) {
+
+                hideSearchLoader();
+
+                $('#MainDataSection').html(data);
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                hideSearchLoader();
+                alert("An error occured. Please try again!");
+            }
+        })
+
+    }
+
+    function PaginationAfterAjax(thisValue) {
+
+        var user_id = $('#user_id_search').val();
+        var user_name = $('#user_name_search').val();
+        var email = $('#email_search').val();
+        var pageId = $(thisValue).attr('rel');
+
+          var Url = '@Url.Action("StudentsListPartial","AdminHome", new { area="Admin"})';
+
+
+        showSearchLoader();
+        $.ajax({
+            type: "GET",
+            url: Url,
+                data: { user_id: user_id, user_name: user_name, email: email, pageId: pageId },
+            // datatype: "json",
+            cache: false,
+            async: false,
+            beforeSend: function () {
+
+                showSearchLoader();
+            },
+            success: function (data) {
+                hideSearchLoader();
+                $('#MainDataSection').html(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                hideSearchLoader();
+                alert("An error occured. Please try again!");
+            }
+        })
+
+    }
+
+
+    function EditItem(user_id, first_name, last_name, user_name, email, is_active) {
+        debugger
+            $('#user_id_edit').val(user_id);
+        $('#first_name_edit').val(first_name);
+        $('#last_name_edit').val(last_name);
+        $('#user_name_edit').val(user_name);
+        $('#email_edit').val(email);
+        $('#is_active_edit').val(is_active);
+    }
+
+
+
+        function DeleteItem(user_id) {
+            $('#user_id_delete').val(user_id);
+
+    }
+
+</script>
+
+
+
+}

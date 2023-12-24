@@ -1,0 +1,106 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Helpers.PageHelpers
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover mb-0">
+        <thead>
+            <tr>
+
+                <th>Student ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Password</th>
+                <th>Courses</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model.student_list.Count() > 0)
+                {
+                    foreach (var item in Model.student_list)
+                    {
+                        <tr>
+                            <td>@item.user_id</td>
+                            <td>@item.first_name</td>
+                            <td>@item.last_name</td>
+                            <td>
+
+                                @item.user_name
+
+                            </td>
+                            <td>     @item.email</td>
+
+                            @{
+                                if (item.is_active == 1)
+                                {
+                                    <td>Active</td>
+                                }
+                                else
+                                {
+                                    <td>In Active</td>
+                                }
+                            }
+                            <td>@item.password</td>
+
+                            <td>
+                                <a class="" href="@Url.Action("StudentRegisteredCourses", "AdminHome", new { area = "Admin", pageId=1, student_id= item.user_id })"> View</a>
+                            </td>
+                            <td>
+                                <div class="justify-content-center">
+                                    <a href="#" class="center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-edit" style="font-size:23px;"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-right" style="">
+                                        <li>
+                                            <a class="dropdown-item" href="#!" onclick="EditItem('@item.user_id', '@item.first_name', '@item.last_name', '@item.user_name', '@item.email', '@item.is_active');" data-toggle="modal" data-target="#myEditModal"><span class="icon-line-plus"></span> Edit</a>
+
+                                            <a class="dropdown-item" href="#!" onclick="DeleteItem('@item.user_id');" data-toggle="modal" data-target="#myDeleteModal"><span class="icon-line-delete"></span> Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3 ustify-content-end" data-label="pagination-div" style="float:right;">
+
+    @{
+        if (Model != null && Model.pageHelperObj != null)
+        {
+            PagerHelper ph = new PagerHelper();
+            ph.CurrentPage = Model.pageHelperObj.CurrentPage;
+            ph.TotalRecords = Model.pageHelperObj.TotalRecords;
+            ph.RecordsPerPage = Model.pageHelperObj.RecordsPerPage;
+
+            ph.AjaxEnabled = true;
+            ph.OnClientClickAjaxCall = "PaginationAfterAjax(this)";
+
+            @await Html.PartialAsync("~/Views/Shared/_Pager.cshtml", ph)
+        }
+
+    }
+
+</div>
+
+
+
+
+<div class="line"></div>
+
+

@@ -1,0 +1,98 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.CommonModels
+@using DAL.Helpers.PageHelpers
+@using DAL.Services
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover mb-0">
+        <thead>
+            <tr>
+
+                <th>Quiz Category</th>
+
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model.quiz_categories_list.Count() > 0)
+                {
+                    foreach (var item in Model.quiz_categories_list)
+                    {
+                        <tr>
+
+                            <td>
+
+                                <div class="posts-sm row col-mb-30">
+                                    <div class="entry col-12">
+                                        <div class="entry-title">
+                                            <h4><a href="#"></a>@item.category_name</h4>
+                                        </div>
+                                        <div class="entry-meta">
+                                            <ul>
+                                                <li><span>By </span><span class="text-success">@item.created_by_username</span></li>
+
+                                                <li><i class="icon-time"></i><span class="text-info">@item.created_at</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+
+                            </td>
+                            <td>
+                                <div class="justify-content-center">
+                                    <a href="#" class="center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon-edit" style="font-size:23px;"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-right" style="">
+                                        <li>
+                                            <a class="dropdown-item" href="#!" onclick="EditItem('@item.category_id', '@item.category_name', '@item.is_active');" data-toggle="modal" data-target="#myEditModal"><span class="icon-line-plus"></span> Edit</a>
+
+                                            <a class="dropdown-item" href="#!" onclick="DeleteItem('@item.category_id');" data-toggle="modal" data-target="#myDeleteModal"><span class="icon-line-delete"></span> Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3 ustify-content-end" data-label="pagination-div" style="float:right;">
+    <!--Note: Following pagination are only if this is partail view(ajax call)-->
+    @{
+        if (Model != null && Model.pageHelperObj != null)
+        {
+            PagerHelper ph = new PagerHelper();
+            ph.CurrentPage = Model.pageHelperObj.CurrentPage;
+            ph.TotalRecords = Model.pageHelperObj.TotalRecords;
+            ph.RecordsPerPage = Model.pageHelperObj.RecordsPerPage;
+
+            ph.AjaxEnabled = true;
+            ph.OnClientClickAjaxCall = "PaginationAfterAjax(this)";
+
+            @await Html.PartialAsync("~/Views/Shared/_Pager.cshtml", ph)
+        }
+
+    }
+
+</div>
+
+
+
+
+<div class="line"></div>
+
+

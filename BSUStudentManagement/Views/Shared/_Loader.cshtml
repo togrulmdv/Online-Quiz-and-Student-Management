@@ -1,0 +1,55 @@
+﻿
+
+<style>
+
+.loader {
+    border: 12px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 12px solid #a8733d;
+    display: inline-block;
+    position: relative;
+    margin: 0 auto;
+    width: 90px;
+    height: 90px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+.search-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: hsla(0,0%,100%,.4);
+    text-align: center;
+    padding-top: 215px;
+    font-size: 30px;
+    z-index: 9999999999;
+}
+/* Safari */
+@@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+</style>
+
+<div class="search-loader" id="search_loader" style="display:none;">
+    <div class="loader"></div>
+</div>
+

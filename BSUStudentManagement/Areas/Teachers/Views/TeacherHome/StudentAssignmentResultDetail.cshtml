@@ -1,0 +1,218 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+@{
+    ViewData["Title"] = "Student Result Detail";
+    Layout = "~/Areas/Teachers/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Teachers/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Result Detail" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+
+                <div class="postcontent col-lg-12">
+
+
+
+
+                    <div id="quiz_questions">
+
+                        <div class="tabs side-tabs mb-0 clearfix" id="tab-6" style="border: 2px solid whitesmoke; padding: 7px;">
+
+                            <ul class="tab-nav tab-nav2 clearfix">
+                                <li><a href="#tabs-21"><i class="icon-home2"></i> Assignment</a></li>
+                                <li><a href="#tabs-22"><i class="icon-reply"></i>Student Answer</a></li>
+                                <li><a href="#tabs-23"><i class="icon-reply"></i>Give Marks</a></li>
+
+
+                            </ul>
+
+
+                            <div class="tab-container">
+
+                                <div class="tab-content clearfix" id="tabs-21">
+
+                                    <form method="post" asp-area="Teachers" asp-controller="justDummyForm" asp-action="justDummyForm" id="justDummyForm" enctype="multipart/form-data">
+
+                                        @Html.AntiForgeryToken()
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-12">
+                                                @*<label for="description">Body<small class="text-danger">*</small></label>*@
+                                                <textarea name="body" id="assignment_body" class="form-control" cols="30" rows="15" required>@Model.assignment_obj.body</textarea>
+
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="tab-content clearfix" id="tabs-22">
+
+
+
+
+                                    <form method="post" asp-area="Users" asp-controller="UserHome" asp-action="SaveStudentAssignmentAnswer" id="SaveAssignment_Form" enctype="multipart/form-data">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-12">
+
+                                                @*<label for="description">Body<small class="text-danger">*</small></label>*@
+                                                <textarea name="student_ans" id="student_ans" class="form-control" cols="30" rows="15" required>@Model.assignment_obj.student_ans</textarea>
+
+                                                <input type="hidden" id="assignment_id" name="assignment_id" value="@Model.assignment_obj.assignment_id" />
+
+
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                                <div class="tab-content clearfix" id="tabs-23">
+
+
+                                    @using (Html.BeginForm("GiveAssignmentMarkToStudent", "TeacherHome", FormMethod.Post, new { area = "Teachers", @id = "marks_form", enctype = "multipart/form-data" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="total_marks">Total Marks <small class="text-danger">*</small></label>
+                                                <input type="number" min="0" autocomplete="off" tabindex="8" class="form-control" id="gain_marks" name="gain_marks" value="@(Model.assignment_obj == null ? 0 : Model.assignment_obj.gain_marks)" required>
+
+                                                <input type="hidden" id="assign_answers_id" name="assign_answers_id" value="@Model.assignment_obj.assign_answers_id" />
+                                            </div>
+
+                                        </div>
+                                        <div class="form-row">
+
+                                            <div class="form-group col-md-4">
+
+
+                                                <button type="submit" tabindex="3" class="button btn-sm button-3d button-rounded gradient-ocean float-right"><i class="icon-save"></i> Save</button>
+
+                                            </div>
+
+                                        </div>
+
+                                    }
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="divider"><i class="icon-circle"></i></div>
+                    </div>
+
+
+
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+</section><!-- #content end -->
+@section scripts{
+
+<!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<!-- TinyMCE Plugin -->
+<script type="text/javascript" src="~/Content/ThemeContent/js/components/tinymce/tinymce.min.js"></script>
+
+<script type="text/javascript">
+    tinymce.init({
+        selector: '#assignment_body',
+        menubar: false,
+
+        setup: function (editor) {
+            editor.on('change', function (e) {
+                editor.save();
+            });
+        }
+    });
+
+
+    tinymce.init({
+        selector: '#student_ans',
+        menubar: false,
+
+        setup: function (editor) {
+            editor.on('change', function (e) {
+                editor.save();
+            });
+        }
+    });
+</script>
+
+
+
+
+
+}
+
+
+

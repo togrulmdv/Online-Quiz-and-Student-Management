@@ -1,0 +1,95 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+
+<!--Following css file is only for this StartQuiz.cshmtl page due to some design-->
+<link href="~/Content/ThemeContent/demos/covid_care/covid-care.css" rel="stylesheet" />
+
+
+
+
+<div class="topic-post reply mt-1 p-4 p-md-5 border-top border-width-5 border-color" style="background-color: #f9be791a; margin-bottom: 33px;">
+
+    <div class="row feature-box-border col-mb-30 justify-content-center align-items-center">
+
+        <div class="clear"></div>
+
+
+
+        @{
+
+            if (Model.quiz_ques_list != null)
+            {
+                int index_no = 1;
+                foreach (var item in Model.quiz_ques_list)
+                {
+                    <div class="col-md-8 feature-box fbox-border fbox-light fbox-effect">
+                        <div class="fbox-icon">
+                            <a href="#"><i>@index_no</i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="nott text-larger mb-2">@item.question_title</h3>
+                            <form>
+
+                                @if (!String.IsNullOrEmpty(item.option_a))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="return SaveAnswer('@item.question_id', 'option_a');">
+                                        <label class="form-check-label" for="flexRadioDefault1" style="font-size: 11px; color: #555555eb; text-transform:none;">
+                                            @item.option_a
+                                        </label>
+
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(item.option_b))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="return SaveAnswer('@item.question_id', 'option_b');">
+                                        <label class="form-check-label" for="flexRadioDefault1" style="font-size: 11px; color: #555555eb;  text-transform:none;">
+                                            @item.option_b
+                                        </label>
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(item.option_c))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="return SaveAnswer('@item.question_id', 'option_c');">
+                                        <label class="form-check-label" for="flexRadioDefault1" style="font-size: 11px; color: #555555eb;  text-transform:none;">
+                                            @item.option_c
+                                        </label>
+                                    </div>
+                                }
+                                @if (!String.IsNullOrEmpty(item.option_d))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="return SaveAnswer('@item.question_id', 'option_d');">
+                                        <label class="form-check-label" for="flexRadioDefault1" style="font-size: 11px; color: #555555eb;  text-transform:none;">
+                                            @item.option_d
+                                        </label>
+                                    </div>
+                                }
+
+
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <div class="clear"></div>
+
+                    index_no++;
+                }
+            }
+
+
+        }
+
+
+    </div>
+
+
+</div>

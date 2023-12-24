@@ -1,0 +1,206 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+@{
+    ViewData["Title"] = "Student Home";
+    Layout = "~/Areas/Users/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+<!-- Page Title
+============================================= -->
+
+<section id="page-title" class="page-title-parallax page-title-center page-title-dark include-header" style="background-image: linear-gradient(to top, rgba(254,150,3,0.5), #39384D), url('/Content/ThemeContent/demos/seo/images/faqs-title.jpg'); background-size: cover; " data-bottom-top="background-position:0px 300px;" data-top-bottom="background-position:0px -300px;">
+    <div id="particles-line"></div>
+
+    <div class="container clearfix mt-4">
+
+        <h1 mt-4>Home</h1>
+
+    </div>
+
+</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+<div id="loader_processes" style="display:none;">
+    <div class="loader_main_w3_school"></div>
+</div>
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+
+            <!-- Form Section
+            ============================================= -->
+            <div class="section mt-0 mb-3" style="background: url('/Content/ThemeContent/demos/seo/images/sections/1.jpg') no-repeat center center; background-size: cover; padding: 50px 0;">
+                <div class="container">
+                    <div class="row justify-content-between align-items-center">
+
+                        <div class="col-md-4">
+                            <div class="heading-block border-bottom-0 bottommargin-sm">
+                                @*<div class="badge badge-pill badge-default">Careers</div>*@
+                                <h3 class="nott ls0">Select your course and take quiz</h3>
+                            </div>
+                            <p>Upon completion of quiz, You will see the result directly.</p>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    @*<h4 class="mb-3">Online Quiz</h4>*@
+                                    <div class="badge badge-pill badge-default">Online Quiz</div>
+                                    <div class="form-widget">
+                                        <div class="form-result"></div>
+
+
+                                        <form method="get" class="row mb-0" asp-area="" asp-controller="UserHome" asp-action="StudentQuizList" id="quiz_select" enctype="multipart/form-data">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <div class="col-12 form-group mb-3">
+                                                <label for="template-contactform-name">Course:*</label>
+
+                                                <select class="form-control input-sm required" id="course_id" name="course_id">
+                                                    <option>Select</option>
+                                                    @{
+                                                        foreach (var item in Model.courses_list)
+                                                        {
+                                                            <option value="@item.course_id">@item.title</option>
+                                                        }
+                                                    }
+
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12  mb-0">
+                                                <button class="button button-rounded btn-block nott ls0 m-0" type="button" onclick="GoToNextPage();" value="Search">Go Next</button>
+
+                                            </div>
+
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mt-5 mt-md-0 center">
+                            @*<a href="https://www.youtube.com/watch?v=P3Huse9K6Xs" data-lightbox="iframe" class="play-icon shadow"><i class="icon-play"></i></a>*@
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</section><!-- #content end -->
+@section scripts{
+
+<!--Following two scripts are for ajax begin form and other ajax calls-->
+    @*<script src="~/Scripts/jquery-3.4.1.js"></script>*@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+
+<script>
+
+    function SubmitSearchForm() {
+
+         var category_name = $('#category_name_search').val();
+        var start_date = $('#start_date_search').val();
+        var end_date = $('#end_date_search').val();
+        //--set page id to 1 for first time form submission
+        var pageId = 1;
+
+
+        var Url = '/admin/quiz/categories/'
+
+       // var Url = '@Url.Action("QuizCategories","AdminBasicData", new { area="Admin"})';
+
+
+        $.ajax({
+            type: "GET",
+            url: Url,
+            data: { category_name: category_name, start_date: start_date, end_date: end_date, pageId: pageId,},
+           // datatype: "json",
+            cache: false,
+            async: false,
+            beforeSend: function () {
+
+                $("#loader_processes").css("display", "block");
+            },
+            success: function (data) {
+
+                $("#loader_processes").css("display", "none");
+
+                $('#MainDataSection').html(data);
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                $("#loader_processes").css("display", "none");
+                alert("An error occured. Please try again!");
+            }
+        })
+
+    }
+
+    function PaginationAfterAjax(thisValue) {
+
+        var category_name = $('#category_name_search').val();
+        var start_date = $('#start_date_search').val();
+        var end_date = $('#end_date_search').val();
+        var pageId = $(thisValue).attr('rel');
+
+
+        var Url = '/admin/quiz/categories/'
+
+       // var Url = '@Url.Action("QuizCategories","AdminBasicData", new { area="Admin"})';
+        $.ajax({
+            type: "GET",
+            url: Url,
+            data: { category_name: category_name, start_date: start_date, end_date: end_date, pageId: pageId,},
+           // datatype: "json",
+            cache: false,
+            async: false,
+            beforeSend: function () {
+
+                $("#loader_processes").css("display", "block");
+            },
+            success: function (data) {
+                $("#loader_processes").css("display", "none");
+                $('#MainDataSection').html(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                $("#loader_processes").css("display", "none");
+                alert("An error occured. Please try again!");
+            }
+        })
+
+    }
+
+    function GoToNextPage() {
+        var course_id = $('#course_id').val();
+        var url = "/users/home/quiz-list/" + course_id + "/1";
+
+        window.location.href = url;
+    }
+
+</script>
+
+
+
+}

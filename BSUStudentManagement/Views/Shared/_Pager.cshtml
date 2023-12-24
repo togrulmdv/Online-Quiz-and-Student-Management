@@ -1,0 +1,55 @@
+﻿@using BSUStudentManagement.CommonCode
+@model PagerHelper
+
+
+<div @((Model==null || Model.TotalPages == 1) ? "style=display:none;" : "")>
+
+    <ul class="pagination pagination-circle pagination-3d pagination-light">
+
+
+        @{
+            if (Model.ShowFirstPrevLinks)
+            {
+                <li class="page-item">
+                    <a href="#!" onclick="@Model.OnClientClickAjaxCall" rel="@(Model.StartPageNumber - 1)" class="page-link"><i class='icon-line-chevrons-left'></i></a>
+                </li>
+            }
+        }
+
+
+
+
+        @{
+            for (int linkForPgCounter = Model.StartPageNumber; linkForPgCounter <= Model.EndPageNumber; linkForPgCounter++)
+            {
+                if (linkForPgCounter == Model.CurrentPage)
+                {
+                    <li class="page-item active"><a class="page-link" href="#!">@linkForPgCounter</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a href="#!" onclick="@Model.OnClientClickAjaxCall" rel="@(linkForPgCounter)" class="page-link">@linkForPgCounter</a></li>
+                }
+            }
+        }
+
+
+
+        @{
+            if (Model.ShowNextLastLinks)
+            {
+                <li class="page-item">
+                    <a href="#!" onclick="@Model.OnClientClickAjaxCall" rel="@(Model.EndPageNumber + 1)" class="page-link"><i class='icon-line-chevron-right'></i></a>
+                </li>
+            }
+        }
+
+
+
+    </ul>
+
+</div>
+
+
+
+

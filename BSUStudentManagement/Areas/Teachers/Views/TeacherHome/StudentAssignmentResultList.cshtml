@@ -1,0 +1,167 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Helpers.PageHelpers
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+
+
+<div class="table-responsive">
+
+    <table class="table table-hover mb-0" style="margin-top: 22px;">
+        <thead>
+            <tr>
+
+                <th>Student ID</th>
+
+                <th>User Name</th>
+
+                <th> Assignment </th>
+
+                <th> Total Marks</th>
+
+                <th> Passing Marks</th>
+                <th> Gain Marks</th>
+                <th> Pass Status</th>
+                <th> Is Checked</th>
+                <th> Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+
+            @{
+                if (Model.std_assignment_result_list.Count() > 0)
+                {
+                    foreach (var item in Model.std_assignment_result_list)
+                    {
+
+                        string checkStatus = item.is_checked_by_teacher == 0 ? "Not checked" : "Cheked";
+                        <tr>
+
+                            <td>@item.student_id</td>
+                            <td>
+                                @item.user_name
+
+                            </td>
+                            <td>
+
+                                @item.assignmentTitle
+                            </td>
+                            <td>
+
+                                <div class="posts-sm row col-mb-30">
+                                    <div class="entry col-12">
+                                        <div class="entry-title">
+                                            <h4 class="text-success">@item.total_marks</h4>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                @item.passing_marks
+
+                            </td>
+                            <td>
+
+
+
+                                @if (checkStatus == "Cheked")
+                                {
+                                    @item.gain_marks
+                                }
+                                else
+                                {
+                                    <span>Not Checked</span>
+                                }
+
+
+                            </td>
+                            <td>
+
+                                <div class="posts-sm row col-mb-30">
+                                    <div class="entry col-12">
+                                        <div class="entry-title">
+                                            @if (checkStatus == "Cheked")
+                                            {
+                                                if (item.passStatus > 0)
+                                                {
+                                                    <h4 class="text-success">Pass</h4>
+                                                }
+                                                else
+                                                {
+                                                    <h4 class="text-success">Fail</h4>
+                                                }
+
+                                            }
+                                            else
+                                            {
+
+                                                <h4 class="text-success">Not Checked</h4>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+                            <td>
+
+
+                                @{
+
+
+                                    <span>@checkStatus</span>
+                                }
+
+
+
+                            </td>
+
+                            <td>
+                                <div class="justify-content-center">
+
+                                    <a class="center" href="@Url.Action("StudentAssignmentResultDetail", "TeacherHome", new { area = "Teachers", assign_answers_id = item.assign_answers_id, student_id=item.student_id })">Mark Assignment</a>
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+                }
+            }
+
+
+        </tbody>
+    </table>
+</div>
+
+
+<div class="mt-3 ustify-content-end" data-label="pagination-div" style="float:right;">
+    @{
+        if (Model != null && Model.pageHelperObj != null)
+        {
+            PagerHelper ph = new PagerHelper();
+            ph.CurrentPage = Model.pageHelperObj.CurrentPage;
+            ph.TotalRecords = Model.pageHelperObj.TotalRecords;
+            ph.RecordsPerPage = Model.pageHelperObj.RecordsPerPage;
+
+            ph.AjaxEnabled = true;
+            ph.OnClientClickAjaxCall = "PaginationAfterAjax(this)";
+
+            @await Html.PartialAsync("~/Views/Shared/_Pager.cshtml", ph)
+        }
+
+    }
+
+</div>
+
+
+

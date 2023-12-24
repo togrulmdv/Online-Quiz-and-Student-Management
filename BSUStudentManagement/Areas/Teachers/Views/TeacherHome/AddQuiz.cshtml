@@ -1,0 +1,259 @@
+﻿@using DAL
+@using DAL.Entities
+@using DAL.Services
+@using DAL.CommonModels
+@using BSUStudentManagement.CommonCode
+@model BasicDataModels
+@{
+    ViewData["Title"] = "Quiz Detail";
+    Layout = "~/Areas/Teachers/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<!-- Page Title
+============================================= -->
+@await Html.PartialAsync("~/Areas/Teachers/Views/Shared/_PageSlider.cshtml", new DAL.CommonModels.GeneralData { PageTitle = "Add Quiz" })
+<!-- #page-title end -->
+<!-- Content
+============================================= -->
+
+
+
+
+
+<section id="content">
+
+    <div class="content-wrap pb-0">
+
+        <div class="container clearfix">
+            <div class="row gutter-40 col-mb-80">
+
+                <!--error message section starts here-->
+
+                <div class="special-div-less-margin">
+                    @if (TempData["SuccessMsg"] != null)
+                    {
+                        if (!String.IsNullOrEmpty(TempData["SuccessMsg"].ToString()))
+                        {
+
+                            <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i>@TempData["SuccessMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+
+                    }
+                    @if (TempData["ErrorMsg"] != null)
+                    {
+
+                        if (!String.IsNullOrEmpty(TempData["ErrorMsg"].ToString()))
+                        {
+                            <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i>@TempData["ErrorMsg"]</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <!--error message section ends here-->
+
+
+
+                <div class="postcontent col-lg-12">
+
+
+                    <div class="tabs tabs-alt tabs-tb tabs-bordered clearfix " id="tab-8">
+
+                        <ul class="tab-nav clearfix">
+                            <li><a href="#tabs-1"><i class="icon-home2 mr-0"></i></a></li>
+                            <li><a href="#tabs-2">Questions</a></li>
+                            <li><a href="#tabs-3">Result</a></li>
+
+                        </ul>
+
+                        <div class="tab-container">
+                            <!--Tab 1 starts here-->
+                            <div class="tab-content clearfix" id="tabs-1">
+
+
+                                <div class="feature-box pt-2 pb-2 pl-3 pr-3 media-box" style="border-radius: 6px; box-shadow: 0 3px 16px rgba(3,27,78,.1); border: 0px solid #e5e8ed;">
+
+                                    <form method="post" class="" asp-area="Teachers" asp-controller="TeacherHome" asp-action="AddQuiz" id="Add_Quiz_Form" enctype="multipart/form-data">
+
+                                        @Html.AntiForgeryToken()
+                                        <div class="form-row">
+                                            <div class="form-group col-md-8">
+                                                <label for="title">Title<small class="text-danger">*</small></label>
+                                                <input type="text" class="form-control" tabindex="1" autocomplete="off" id="title" name="title" required>
+                                                <label id="category_name_save_error" class="error-message-form" for="title" style="display: none;"></label>
+
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="status">Status<small class="text-danger">*</small></label>
+                                                <select id="status" name="status" tabindex="2" class="form-control" required>
+                                                    @{
+                                                        <option selected>Select</option>
+
+                                                        if (ViewBag.StatusList != null)
+                                                        {
+                                                            foreach (var item in ViewBag.StatusList as List<status>)
+                                                            {
+                                                                <option value="@item.status_id">@item.title</option>
+                                                            }
+                                                        }
+
+                                                    }
+                                                </select>
+
+
+                                                <label id="category_name_save_error" class="error-message-form" for="status" style="display: none;"></label>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-4">
+                                                <label for="category_name">Start Date<small class="text-danger">*</small></label>
+                                                <div class="form-group">
+                                                    <div class="input-group text-left" data-target-input="nearest" data-target=".datetimepicker">
+
+                                                        <input type="text" id="start_date" tabindex="3" autocomplete="off" name="start_date" class="form-control text-left component-datepicker today" required>
+                                                        <div class="input-group-append" data-target=".datetimepicker" data-toggle="datetimepicker">
+                                                            <div class="input-group-text"><i class="icon-calendar"></i></div>
+                                                        </div>
+                                                    </div>
+                                                    <label id="template-contactform-name-error" class="error-message-form" for="template-contactform-name" style="display: none;">error message</label>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group col-md-4">
+                                                <label for="end_date">End Date<small class="text-danger">*</small></label>
+                                                <div class="form-group">
+                                                    <div class="input-group text-left" data-target-input="nearest" data-target=".datetimepicker">
+                                                        <input type="text" id="end_date" tabindex="4" autocomplete="off" name="end_date" class="form-control text-left component-datepicker today" required>
+
+                                                        <div class="input-group-append" data-target=".datetimepicker" data-toggle="datetimepicker">
+                                                            <div class="input-group-text"><i class="icon-calendar"></i></div>
+                                                        </div>
+                                                    </div>
+                                                    <label id="template-contactform-name-error" class="error-message-form" for="end_date" style="display: none;">error message</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="allowed_time_minutes">Allowed Time In Minutes<small class="text-danger">*</small></label>
+                                                <input type="number" min="0" autocomplete="off" tabindex="5" class="form-control" id="allowed_time_minutes" name="allowed_time_minutes" required>
+                                                <label id="category_name_save_error" class="error-message-form" for="allowed_time_minutes" style="display: none;"></label>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="category_id">Quiz Category<small class="text-danger">*</small></label>
+                                                <select id="category_id" name="category_id" class="form-control" tabindex="6" required>
+                                                    @{
+                                                        <option selected>Select</option>
+
+                                                        foreach (var item in ViewBag.QuizCategories as List<quiz_categories>)
+                                                        {
+                                                            <option value="@item.category_id">@item.category_name</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <label id="category_name_save_error" class="error-message-form" for="category_id" style="display: none;"></label>
+
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="course_id">Course<small class="text-danger">*</small></label>
+                                                <select id="course_id" name="course_id" tabindex="8" class="form-control" required>
+                                                    @{
+                                                        <option selected>Select</option>
+
+                                                        foreach (var item in ViewBag.CoursesList as List<courses>)
+                                                        {
+                                                            <option value="@item.course_id">@item.title</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <label id="category_name_save_error" class="error-message-form" for="course_id" style="display: none;"></label>
+
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="passing_marks">Passing Marks(%)<small class="text-danger">*</small></label>
+                                                <input type="number" min="0" max="100" autocomplete="off" tabindex="8" class="form-control" id="passing_marks" name="passing_marks" value="50" required>
+                                                <label id="passing_marks_save_error" class="error-message-form" for="passing_marks" style="display: none;"></label>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-row">
+
+
+                                            <div class="form-group col-md-8">
+                                                <label for="description">Description<small class="text-danger">*</small></label>
+                                                <textarea type="text" class="form-control" autocomplete="off" tabindex="9" id="description" name="description" required></textarea>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <button type="submit" tabindex="10" class="button btn-sm button-3d button-rounded gradient-ocean float-right"><i class="icon-save"></i> Save</button>
+
+                                            </div>
+
+
+                                        </div>
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                            <!--Tab 2 starts here-->
+                            <div class="tab-content clearfix" id="tabs-2">
+
+
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <h2>No data found</h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Tab 2 starts here-->
+                            <div class="tab-content clearfix" id="tabs-3">
+
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <h2>No data found</h2>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="line"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+</section><!-- #content end -->
